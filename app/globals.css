@@ -21,3 +21,12 @@ body {
 .glass-card {
   @apply rounded-2xl border border-emeraldGlow/20 bg-charcoal/80 shadow-soft backdrop-blur;
 }
+
+.step-fade {
+  animation: fadeStep 260ms ease;
+}
+
+@keyframes fadeStep {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
