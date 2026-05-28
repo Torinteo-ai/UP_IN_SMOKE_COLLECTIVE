@@ -85,4 +85,4 @@ Required environment variables:
 
 Run `db/eligibility_leads.sql` in Supabase SQL editor to ensure the existing `eligibility_leads` table has a persisted `status` column and constraints.
 
-<!-- trigger deployment -->
+<!-- trigger deployment: 2026-05-28 fresh Vercel Git deployment -->
