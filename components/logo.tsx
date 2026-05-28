@@ -1,22 +1,25 @@
-'use client';
-
 type LogoProps = {
   className?: string;
   showWordmark?: boolean;
 };
 
-export default function Logo({ className = '', showWordmark = true }: LogoProps) {
-  const size = showWordmark ? 84 : 40;
-
+export function Logo(_props: LogoProps = {}) {
   return (
-    <img
-      src="/logo/uisc-logo.svg?v=real-vector-20260528"
-      alt=""
-      width={size}
-      height={size}
-      className={`${showWordmark ? 'w-[min(32vw,84px)] md:w-[84px]' : 'w-10'} h-auto ${className}`.trim()}
-      loading="eager"
-      decoding="async"
-    />
-  );
+    <div style={{
+      width: '220px',
+      height: '80px',
+      background: 'red',
+      color: 'white',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '32px',
+      fontWeight: 'bold',
+      zIndex: 999999
+    }}>
+      TEST LOGO
+    </div>
+  )
 }
+
+export default Logo;
