@@ -1,5 +1,8 @@
-import { createSupabaseAdminClient } from '@/lib/supabase';
+'use client';
+
+import { useEffect, useState } from 'react';
 import LeadStatusSelect from '@/components/lead-status-select';
+import LeadNoteEditor from '@/components/lead-note-editor';
 import { LEAD_STATUS_OPTIONS, type LeadStatus } from '@/lib/lead-validation';
 
 type Lead = {
@@ -10,81 +13,64 @@ type Lead = {
   consultation_interest: string | null;
   created_at: string;
   status: LeadStatus | null;
+  admin_note: string | null;
+  updated_at: string | null;
+  status_updated_at: string | null;
 };
 
-const formatDate = (value: string) => {
+const formatDate = (value: string | null) => {
+  if (!value) return '—';
   const date = new Date(value);
-
   if (Number.isNaN(date.getTime())) return value;
-
-  return new Intl.DateTimeFormat('en-GB', {
-    dateStyle: 'medium',
-    timeStyle: 'short',
-  }).format(date);
+  return new Intl.DateTimeFormat('en-GB', { dateStyle: 'medium', timeStyle: 'short' }).format(date);
 };
 
-function StatusBadge({ status }: { status: LeadStatus }) {
-  const toneMap: Record<LeadStatus, string> = {
-    New: 'border-emeraldGlow/50 bg-emeraldGlow/10 text-emeraldGlow',
-    Contacted: 'border-sky-400/40 bg-sky-400/10 text-sky-300',
-    Approved: 'border-violet-400/40 bg-violet-400/10 text-violet-300',
-    Closed: 'border-zinc-500/40 bg-zinc-500/10 text-zinc-300',
-  };
+export default function AdminLeadsPage() {
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [status, setStatus] = useState('');
+  const [consultation, setConsultation] = useState('');
+  const [createdFrom, setCreatedFrom] = useState('');
+  const [createdTo, setCreatedTo] = useState('');
+  const [q, setQ] = useState('');
 
-  return <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${toneMap[status]}`}>{status}</span>;
-}
+  useEffect(() => {
+    const load = async () => {
+      setLoading(true);
+      setError('');
+      const params = new URLSearchParams({ page: String(page) });
+      if (status) params.set('status', status);
+      if (consultation) params.set('consultation', consultation);
+      if (createdFrom) params.set('createdFrom', createdFrom);
+      if (createdTo) params.set('createdTo', createdTo);
+      if (q) params.set('q', q);
 
-export default async function AdminLeadsPage() {
-  const supabaseAdmin = createSupabaseAdminClient();
+      const response = await fetch(`/api/admin/leads?${params.toString()}`);
+      const json = await response.json();
+      if (!response.ok || !json?.ok) {
+        setError('Could not load leads right now.');
+        setLoading(false);
+        return;
+      }
+      setLeads(json.data.leads);
+      setTotalPages(json.data.pagination.totalPages);
+      setLoading(false);
+    };
+    load();
+  }, [page, status, consultation, createdFrom, createdTo, q]);
 
-  const { data, error } = await supabaseAdmin
-    .from('eligibility_leads')
-    .select('id, first_name, email, condition_category, consultation_interest, created_at, status')
-    .order('created_at', { ascending: false });
+  return <main className="section-shell py-10 md:py-14"><div className="glass-card p-6 md:p-8"><h1 className="mb-4 text-2xl font-semibold text-white md:text-3xl">Onboarding Leads</h1>
+    <div className="mb-4 grid gap-2 md:grid-cols-5"><input placeholder="Search name/email" value={q} onChange={(e)=>{setPage(1);setQ(e.target.value);}} className="rounded border border-white/20 bg-zinc-900 px-2 py-1 text-sm text-white" />
+    <select value={status} onChange={(e)=>{setPage(1);setStatus(e.target.value);}} className="rounded border border-white/20 bg-zinc-900 px-2 py-1 text-sm text-white"><option value="">All statuses</option>{LEAD_STATUS_OPTIONS.map(s=><option key={s} value={s}>{s}</option>)}</select>
+    <input type="date" value={createdFrom} onChange={(e)=>{setPage(1);setCreatedFrom(e.target.value);}} className="rounded border border-white/20 bg-zinc-900 px-2 py-1 text-sm text-white" />
+    <input type="date" value={createdTo} onChange={(e)=>{setPage(1);setCreatedTo(e.target.value);}} className="rounded border border-white/20 bg-zinc-900 px-2 py-1 text-sm text-white" />
+    <select value={consultation} onChange={(e)=>{setPage(1);setConsultation(e.target.value);}} className="rounded border border-white/20 bg-zinc-900 px-2 py-1 text-sm text-white"><option value="">All consultation prefs</option><option value="Yes, I want a consultation">Yes</option><option value="Not right now">Not now</option></select></div>
 
-  const leads: Lead[] = data ?? [];
+    {loading ? <div className="rounded-xl border border-white/10 bg-zinc-950/40 p-8 text-center text-zinc-300">Loading leads...</div> : error ? <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">{error}</div> : leads.length===0 ? <div className="rounded-xl border border-white/10 bg-zinc-950/40 p-8 text-center text-zinc-300">No leads match current filters.</div> : <div className="space-y-4">{leads.map((lead)=>{const currentStatus = LEAD_STATUS_OPTIONS.includes((lead.status ?? 'New') as LeadStatus) ? (lead.status as LeadStatus) : 'New'; return <article key={lead.id} className="rounded-xl border border-white/10 bg-zinc-950/50 p-4"><p className="text-xs text-zinc-400">Submitted {formatDate(lead.created_at)}</p><h2 className="mt-1 text-lg font-semibold text-white">{lead.first_name || 'Unnamed lead'}</h2><p className="text-sm text-zinc-300">{lead.email || '—'}</p><p className="text-sm text-zinc-300">{lead.consultation_interest || '—'}</p><p className="text-xs text-zinc-500">Updated: {formatDate(lead.updated_at)} | Status updated: {formatDate(lead.status_updated_at)}</p><div className="mt-3"><LeadStatusSelect leadId={lead.id} initialStatus={currentStatus} /></div><div className="mt-3"><LeadNoteEditor leadId={lead.id} initialNote={lead.admin_note} /></div></article>;})}</div>}
 
-  return (
-    <main className="section-shell py-10 md:py-14">
-      <div className="glass-card p-6 md:p-8">
-        <div className="mb-6 flex flex-wrap items-end justify-between gap-3 border-b border-white/10 pb-4">
-          <div>
-            <p className="text-xs uppercase tracking-[0.2em] text-zinc-400">Internal Admin</p>
-            <h1 className="mt-2 text-2xl font-semibold text-white md:text-3xl">Onboarding Leads</h1>
-          </div>
-          <p className="text-sm text-zinc-400">{leads.length} lead{leads.length === 1 ? '' : 's'}</p>
-        </div>
-
-        {error ? (
-          <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">Could not load leads right now. Please refresh and try again.</div>
-        ) : leads.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-zinc-950/40 p-8 text-center text-zinc-300">No onboarding submissions yet.</div>
-        ) : (
-          <div className="space-y-4">
-            {leads.map((lead) => {
-              const status = LEAD_STATUS_OPTIONS.includes((lead.status ?? 'New') as LeadStatus) ? (lead.status as LeadStatus) : 'New';
-
-              return (
-                <article key={lead.id} className="rounded-xl border border-white/10 bg-zinc-950/50 p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <p className="text-xs uppercase tracking-[0.12em] text-zinc-400">Submitted {formatDate(lead.created_at)}</p>
-                    <StatusBadge status={status} />
-                  </div>
-                  <h2 className="mt-2 text-lg font-semibold text-white">{lead.first_name || 'Unnamed lead'}</h2>
-                  <dl className="mt-3 space-y-2 text-sm">
-                    <div><dt className="text-zinc-400">Email</dt><dd className="text-zinc-200">{lead.email || '—'}</dd></div>
-                    <div><dt className="text-zinc-400">Condition</dt><dd className="text-zinc-200">{lead.condition_category || '—'}</dd></div>
-                    <div><dt className="text-zinc-400">Consultation</dt><dd className="text-zinc-200">{lead.consultation_interest || '—'}</dd></div>
-                  </dl>
-                  <div className="mt-4">
-                    <LeadStatusSelect leadId={lead.id} initialStatus={status} />
-                  </div>
-                </article>
-              );
-            })}
-          </div>
-        )}
-      </div>
-    </main>
-  );
+    <div className="mt-6 flex items-center justify-between"><button disabled={page<=1} onClick={()=>setPage((p)=>Math.max(1,p-1))} className="rounded border border-white/20 px-3 py-1 text-xs text-white disabled:opacity-40">Previous</button><span className="text-xs text-zinc-400">Page {page} of {totalPages}</span><button disabled={page>=totalPages} onClick={()=>setPage((p)=>Math.min(totalPages,p+1))} className="rounded border border-white/20 px-3 py-1 text-xs text-white disabled:opacity-40">Next</button></div>
+  </div></main>;
 }

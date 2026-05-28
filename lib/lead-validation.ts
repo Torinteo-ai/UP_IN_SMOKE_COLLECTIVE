@@ -63,3 +63,15 @@ export const parseLeadStatus = (payload: unknown): { status?: LeadStatus; error?
 
   return { status };
 };
+
+export const parseLeadNote = (payload: unknown): { note?: string; error?: string } => {
+  if (!isObject(payload)) return { error: 'Invalid request payload.' };
+
+  const note = String(payload.note ?? '').trim();
+
+  if (note.length > 2000) {
+    return { error: 'Note must be 2000 characters or fewer.' };
+  }
+
+  return { note };
+};
