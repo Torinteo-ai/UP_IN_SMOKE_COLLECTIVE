@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
+import { supabase } from '@/lib/supabase';
 
 type FormData = {
   firstName: string;
@@ -24,6 +25,7 @@ export default function EligibilityForm() {
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
   const [storageReady, setStorageReady] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     if (typeof window === 'undefined') return;
@@ -61,14 +63,36 @@ export default function EligibilityForm() {
   const onNext = () => { const e = validateStep(); if (e) return setError(e); setStep((s) => Math.min(s + 1, totalSteps)); };
   const onBack = () => { setError(''); setStep((s) => Math.max(s - 1, 1)); };
 
-  const onSubmit = (event: FormEvent) => {
+  const onSubmit = async (event: FormEvent) => {
     event.preventDefault();
     const e = validateStep();
     if (e) return setError(e);
-    console.info('Eligibility submission placeholder', formData);
+
+    setError('');
+    setIsSubmitting(true);
+
+    const { error: submissionError } = await supabase.from('eligibility_leads').insert({
+      first_name: formData.firstName.trim(),
+      email: formData.email.trim(),
+      age_confirmed: formData.ageConfirmed,
+      uk_resident: formData.ukResident,
+      condition_category: formData.conditionCategory,
+      previous_treatments: formData.previousTreatments.trim(),
+      consultation_interest: formData.consultationInterest,
+      consent: formData.consent
+    });
+
+    if (submissionError) {
+      setError('We could not submit your onboarding right now. Please try again in a moment.');
+      setIsSubmitting(false);
+      return;
+    }
+
     if (typeof window !== 'undefined') {
       window.localStorage.removeItem(STORAGE_KEY);
     }
+
+    setIsSubmitting(false);
     setSubmitted(true);
   };
 
@@ -84,7 +108,7 @@ export default function EligibilityForm() {
         {step === 4 && <div className="space-y-5"><h2 className="text-2xl font-semibold text-white">Consultation interest and consent</h2><div><p className="mb-3 text-sm text-zinc-300">Are you interested in booking a consultation?</p><div className="space-y-3">{consultationOptions.map((option)=><label key={option} className="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-700 p-4"><input type="radio" name="consultation" className="mt-1 h-4 w-4 accent-emeraldGlow" checked={formData.consultationInterest===option} onChange={()=>update('consultationInterest',option)} /><span className="text-zinc-200">{option}</span></label>)}</div></div><label className="flex cursor-pointer items-start gap-3 rounded-xl border border-zinc-700 p-4"><input type="checkbox" className="mt-1 h-4 w-4 accent-emeraldGlow" checked={formData.consent} onChange={(e)=>update('consent',e.target.checked)} /><span className="text-zinc-200">I consent to UP IN SMOKE storing this onboarding information for follow-up contact.</span></label><div className="space-y-1 text-sm text-zinc-400"><p>Submission does not guarantee prescription approval.</p><p>Consultations are subject to clinician assessment.</p></div></div>}
       </div>
       {error && <p className="mt-5 text-sm text-red-400">{error}</p>}
-      <div className="sticky bottom-0 left-0 right-0 mt-8 -mx-6 border-t border-white/10 bg-charcoal/95 p-4 backdrop-blur md:static md:m-0 md:border-0 md:bg-transparent md:p-0"><div className="flex items-center justify-between gap-3"><button type="button" onClick={onBack} disabled={step===1} className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40">Back</button>{step<totalSteps ? <button type="button" onClick={onNext} className="rounded-full bg-emeraldGlow px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110">Continue</button> : <button type="submit" className="rounded-full bg-emeraldGlow px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110">Submit onboarding</button>}</div></div>
+      <div className="sticky bottom-0 left-0 right-0 mt-8 -mx-6 border-t border-white/10 bg-charcoal/95 p-4 backdrop-blur md:static md:m-0 md:border-0 md:bg-transparent md:p-0"><div className="flex items-center justify-between gap-3"><button type="button" onClick={onBack} disabled={step===1 || isSubmitting} className="rounded-full border border-zinc-700 px-5 py-2 text-sm font-medium text-zinc-200 disabled:cursor-not-allowed disabled:opacity-40">Back</button>{step<totalSteps ? <button type="button" onClick={onNext} disabled={isSubmitting} className="rounded-full bg-emeraldGlow px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40">Continue</button> : <button type="submit" disabled={isSubmitting} className="rounded-full bg-emeraldGlow px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40">{isSubmitting ? 'Submitting...' : 'Submit onboarding'}</button>}</div></div>
     </form>
   );
 }
