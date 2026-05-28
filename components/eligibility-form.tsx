@@ -23,13 +23,27 @@ export default function EligibilityForm() {
   const [step, setStep] = useState(1);
   const [error, setError] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [storageReady, setStorageReady] = useState(false);
 
   useEffect(() => {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (!saved) return;
-    try { setFormData({ ...initialData, ...(JSON.parse(saved) as FormData) }); } catch { localStorage.removeItem(STORAGE_KEY); }
+    if (typeof window === 'undefined') return;
+
+    const saved = window.localStorage.getItem(STORAGE_KEY);
+    if (saved) {
+      try {
+        setFormData({ ...initialData, ...(JSON.parse(saved) as FormData) });
+      } catch {
+        window.localStorage.removeItem(STORAGE_KEY);
+      }
+    }
+
+    setStorageReady(true);
   }, []);
-  useEffect(() => { localStorage.setItem(STORAGE_KEY, JSON.stringify(formData)); }, [formData]);
+
+  useEffect(() => {
+    if (!storageReady || typeof window === 'undefined') return;
+    window.localStorage.setItem(STORAGE_KEY, JSON.stringify(formData));
+  }, [formData, storageReady]);
 
   const totalSteps = 4;
   const progress = useMemo(() => Math.round((step / totalSteps) * 100), [step]);
@@ -52,7 +66,9 @@ export default function EligibilityForm() {
     const e = validateStep();
     if (e) return setError(e);
     console.info('Eligibility submission placeholder', formData);
-    localStorage.removeItem(STORAGE_KEY);
+    if (typeof window !== 'undefined') {
+      window.localStorage.removeItem(STORAGE_KEY);
+    }
     setSubmitted(true);
   };
 
