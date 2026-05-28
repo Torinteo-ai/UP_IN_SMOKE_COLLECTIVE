@@ -1,20 +1,43 @@
-export function Logo() {
-  return (
-    <div
-      style={{
-        width: '220px',
-        height: '80px',
-        background: 'red',
-        color: 'white',
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'center',
-        fontSize: '32px',
-        fontWeight: 'bold',
-        zIndex: 999999,
-      }}
-    >
-      TEST LOGO
-    </div>
-  )
+type LogoProps = {
+  className?: string;
+  showWordmark?: boolean;
 }
+
+export function Logo({ className = '', showWordmark = true }: LogoProps) {
+  const sizeClasses = showWordmark
+    ? 'h-14 w-14 sm:h-16 sm:w-16'
+    : 'h-11 w-11 sm:h-12 sm:w-12';
+
+  return (
+    <svg
+      className={`${sizeClasses} ${className}`.trim()}
+      viewBox="0 0 736 736"
+      role="img"
+      aria-label="UP IN SMOKE COLLECTIVE logo"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="736" height="736" rx="110" fill="#171b17" />
+      <circle cx="368" cy="368" r="252" fill="none" stroke="#d8d1c1" strokeWidth="20" />
+      <g fill="none" stroke="#efe7d7" strokeWidth="28" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M180 284v78c0 44 30 72 74 72s74-28 74-72v-78" />
+        <path d="M373 284h86M416 284v150M373 434h86" />
+        <path d="M563 301c-20-15-44-22-72-22-44 0-74 19-74 48 0 32 34 42 72 48 42 7 74 17 74 51 0 30-31 48-76 48-31 0-59-8-82-25" />
+        <path d="M638 313c-24-22-53-32-85-32-63 0-108 44-108 96s45 96 108 96c33 0 62-11 85-33" />
+      </g>
+      <g fill="none" stroke="#b8b0a0" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M205 468c-5-4-11-6-18-6-14 0-24 10-24 24s10 24 24 24c7 0 13-2 18-6" />
+        <path d="M220 486c0-14 10-24 24-24s24 10 24 24-10 24-24 24-24-10-24-24z" />
+        <path d="M289 464v44h28" />
+        <path d="M337 464v44h28" />
+        <path d="M386 464h33M386 486h27M386 508h33M386 464v44" />
+        <path d="M477 468c-5-4-11-6-18-6-14 0-24 10-24 24s10 24 24 24c7 0 13-2 18-6" />
+        <path d="M492 464h42M513 464v44" />
+        <path d="M553 464h34M570 464v44M553 508h34" />
+        <path d="M608 464l18 44 18-44" />
+        <path d="M664 464h33M664 486h27M664 508h33M664 464v44" />
+      </g>
+    </svg>
+  );
+}
+
+export default Logo;
