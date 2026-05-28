@@ -74,3 +74,13 @@ Up In Smoke is an independent educational and patient onboarding platform.
 We do not prescribe, dispense, or supply medical cannabis products. All medical consultations, prescriptions, and dispensing are handled solely by licensed healthcare professionals and regulated UK partner clinics and pharmacies.
 
 Eligibility does not guarantee prescription approval.
+
+## Admin security + lead status setup
+
+Required environment variables:
+
+- `ADMIN_BASIC_AUTH_USER`
+- `ADMIN_BASIC_AUTH_PASSWORD`
+- `SUPABASE_SERVICE_ROLE_KEY`
+
+Run `db/eligibility_leads.sql` in Supabase SQL editor to ensure the existing `eligibility_leads` table has a persisted `status` column and constraints.

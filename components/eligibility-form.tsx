@@ -1,7 +1,6 @@
 'use client';
 
 import { FormEvent, useEffect, useMemo, useState } from 'react';
-import { supabase } from '@/lib/supabase';
 
 type FormData = {
   firstName: string;
@@ -71,18 +70,15 @@ export default function EligibilityForm() {
     setError('');
     setIsSubmitting(true);
 
-    const { error: submissionError } = await supabase.from('eligibility_leads').insert({
-      first_name: formData.firstName.trim(),
-      email: formData.email.trim(),
-      age_confirmed: formData.ageConfirmed,
-      uk_resident: formData.ukResident,
-      condition_category: formData.conditionCategory,
-      previous_treatments: formData.previousTreatments.trim(),
-      consultation_interest: formData.consultationInterest,
-      consent: formData.consent
+    const response = await fetch('/api/eligibility-leads', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(formData),
     });
 
-    if (submissionError) {
+    if (!response.ok) {
       setError('We could not submit your onboarding right now. Please try again in a moment.');
       setIsSubmitting(false);
       return;

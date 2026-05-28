@@ -1,4 +1,6 @@
-import { supabase } from '@/lib/supabase';
+import { createSupabaseAdminClient } from '@/lib/supabase';
+import LeadStatusSelect from '@/components/lead-status-select';
+import { LEAD_STATUS_OPTIONS, type LeadStatus } from '@/lib/lead-validation';
 
 type Lead = {
   id: string;
@@ -7,9 +9,8 @@ type Lead = {
   condition_category: string | null;
   consultation_interest: string | null;
   created_at: string;
+  status: LeadStatus | null;
 };
-
-const statusOptions = ['New', 'Contacted', 'Approved', 'Closed'] as const;
 
 const formatDate = (value: string) => {
   const date = new Date(value);
@@ -22,25 +23,23 @@ const formatDate = (value: string) => {
   }).format(date);
 };
 
-function StatusBadge({ status }: { status: (typeof statusOptions)[number] }) {
-  const toneMap: Record<(typeof statusOptions)[number], string> = {
+function StatusBadge({ status }: { status: LeadStatus }) {
+  const toneMap: Record<LeadStatus, string> = {
     New: 'border-emeraldGlow/50 bg-emeraldGlow/10 text-emeraldGlow',
     Contacted: 'border-sky-400/40 bg-sky-400/10 text-sky-300',
     Approved: 'border-violet-400/40 bg-violet-400/10 text-violet-300',
     Closed: 'border-zinc-500/40 bg-zinc-500/10 text-zinc-300',
   };
 
-  return (
-    <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${toneMap[status]}`}>
-      {status}
-    </span>
-  );
+  return <span className={`rounded-full border px-2.5 py-1 text-xs font-medium ${toneMap[status]}`}>{status}</span>;
 }
 
 export default async function AdminLeadsPage() {
-  const { data, error } = await supabase
+  const supabaseAdmin = createSupabaseAdminClient();
+
+  const { data, error } = await supabaseAdmin
     .from('eligibility_leads')
-    .select('id, first_name, email, condition_category, consultation_interest, created_at')
+    .select('id, first_name, email, condition_category, consultation_interest, created_at, status')
     .order('created_at', { ascending: false });
 
   const leads: Lead[] = data ?? [];
@@ -57,76 +56,33 @@ export default async function AdminLeadsPage() {
         </div>
 
         {error ? (
-          <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
-            Could not load leads right now. Please refresh and try again.
-          </div>
+          <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">Could not load leads right now. Please refresh and try again.</div>
         ) : leads.length === 0 ? (
-          <div className="rounded-xl border border-white/10 bg-zinc-950/40 p-8 text-center text-zinc-300">
-            No onboarding submissions yet.
-          </div>
+          <div className="rounded-xl border border-white/10 bg-zinc-950/40 p-8 text-center text-zinc-300">No onboarding submissions yet.</div>
         ) : (
-          <>
-            <div className="hidden overflow-x-auto md:block">
-              <table className="min-w-full text-left text-sm">
-                <thead className="text-xs uppercase tracking-[0.15em] text-zinc-400">
-                  <tr className="border-b border-white/10">
-                    <th className="px-3 py-3">Name</th>
-                    <th className="px-3 py-3">Email</th>
-                    <th className="px-3 py-3">Condition</th>
-                    <th className="px-3 py-3">Consultation</th>
-                    <th className="px-3 py-3">Submitted</th>
-                    <th className="px-3 py-3">Status</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {leads.map((lead) => (
-                    <tr key={lead.id} className="border-b border-white/5 text-zinc-200">
-                      <td className="px-3 py-4">{lead.first_name || '—'}</td>
-                      <td className="px-3 py-4">{lead.email || '—'}</td>
-                      <td className="px-3 py-4">{lead.condition_category || '—'}</td>
-                      <td className="px-3 py-4">{lead.consultation_interest || '—'}</td>
-                      <td className="px-3 py-4 text-zinc-300">{formatDate(lead.created_at)}</td>
-                      <td className="px-3 py-4">
-                        <div className="flex flex-wrap gap-2">
-                          {statusOptions.map((status) => (
-                            <StatusBadge key={`${lead.id}-${status}`} status={status} />
-                          ))}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+          <div className="space-y-4">
+            {leads.map((lead) => {
+              const status = LEAD_STATUS_OPTIONS.includes((lead.status ?? 'New') as LeadStatus) ? (lead.status as LeadStatus) : 'New';
 
-            <div className="space-y-4 md:hidden">
-              {leads.map((lead) => (
+              return (
                 <article key={lead.id} className="rounded-xl border border-white/10 bg-zinc-950/50 p-4">
-                  <p className="text-xs uppercase tracking-[0.12em] text-zinc-400">Submitted {formatDate(lead.created_at)}</p>
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <p className="text-xs uppercase tracking-[0.12em] text-zinc-400">Submitted {formatDate(lead.created_at)}</p>
+                    <StatusBadge status={status} />
+                  </div>
                   <h2 className="mt-2 text-lg font-semibold text-white">{lead.first_name || 'Unnamed lead'}</h2>
                   <dl className="mt-3 space-y-2 text-sm">
-                    <div>
-                      <dt className="text-zinc-400">Email</dt>
-                      <dd className="text-zinc-200">{lead.email || '—'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-zinc-400">Condition</dt>
-                      <dd className="text-zinc-200">{lead.condition_category || '—'}</dd>
-                    </div>
-                    <div>
-                      <dt className="text-zinc-400">Consultation</dt>
-                      <dd className="text-zinc-200">{lead.consultation_interest || '—'}</dd>
-                    </div>
+                    <div><dt className="text-zinc-400">Email</dt><dd className="text-zinc-200">{lead.email || '—'}</dd></div>
+                    <div><dt className="text-zinc-400">Condition</dt><dd className="text-zinc-200">{lead.condition_category || '—'}</dd></div>
+                    <div><dt className="text-zinc-400">Consultation</dt><dd className="text-zinc-200">{lead.consultation_interest || '—'}</dd></div>
                   </dl>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    {statusOptions.map((status) => (
-                      <StatusBadge key={`${lead.id}-mobile-${status}`} status={status} />
-                    ))}
+                  <div className="mt-4">
+                    <LeadStatusSelect leadId={lead.id} initialStatus={status} />
                   </div>
                 </article>
-              ))}
-            </div>
-          </>
+              );
+            })}
+          </div>
         )}
       </div>
     </main>
