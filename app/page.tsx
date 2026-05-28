@@ -20,7 +20,7 @@ export default function HomePage() {
     <main className="brand-surface min-h-screen">
       <header className="brand-nav">
         <div className="section-shell flex h-20 items-center justify-between gap-4">
-          <a href="#top" aria-label="UP IN SMOKE home">
+          <a href="#top" aria-label="Home">
             <Logo />
           </a>
           <nav className="hidden items-center gap-8 text-sm text-stone-300 md:flex">
