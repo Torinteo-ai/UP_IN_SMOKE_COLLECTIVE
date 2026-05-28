@@ -43,7 +43,7 @@ export default function HomePage() {
           Built for eligible UK patients seeking a refined, secure, and clinician-led journey with trusted licensed partners.
         </p>
         <div className="mt-10 flex flex-wrap gap-4">
-          <a href="#eligibility" className="animate-pulseGlow rounded-full bg-emeraldGlow px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110">Check Eligibility</a>
+          <a href="/eligibility" className="animate-pulseGlow rounded-full bg-emeraldGlow px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110">Check Eligibility</a>
           <a href="#cta" className="rounded-full border border-zinc-700 px-6 py-3 text-sm font-semibold text-zinc-200 transition hover:border-emeraldGlow/50 hover:text-emeraldGlow">Book Consultation</a>
         </div>
       </section>
@@ -66,7 +66,7 @@ export default function HomePage() {
           <p className="mt-4 max-w-3xl text-zinc-300">
             Eligibility is reviewed by independent clinicians based on your health history and treatment needs. Conditions may include chronic pain, anxiety, PTSD, insomnia, ADHD, and other clinician-assessed cases.
           </p>
-          <a href="#cta" className="mt-8 inline-flex rounded-full bg-emeraldGlow px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110">Check Eligibility</a>
+          <a href="/eligibility" className="mt-8 inline-flex rounded-full bg-emeraldGlow px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110">Check Eligibility</a>
         </div>
       </section>
 
@@ -96,7 +96,7 @@ export default function HomePage() {
           <h2 className="text-3xl font-semibold text-white">Ready to begin your wellness journey?</h2>
           <p className="mx-auto mt-4 max-w-2xl text-zinc-300">Start with a quick eligibility check or secure a professional consultation through our UK clinical network.</p>
           <div className="mt-8 flex flex-wrap justify-center gap-4">
-            <a href="#" className="rounded-full bg-emeraldGlow px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110">Check Eligibility</a>
+            <a href="/eligibility" className="rounded-full bg-emeraldGlow px-6 py-3 text-sm font-semibold text-ink transition hover:brightness-110">Check Eligibility</a>
             <a href="#" className="rounded-full border border-zinc-700 px-6 py-3 text-sm font-semibold text-zinc-100 transition hover:border-emeraldGlow/50 hover:text-emeraldGlow">Book Consultation</a>
             <a href="#community" className="rounded-full border border-zinc-700 px-6 py-3 text-sm font-semibold text-zinc-100 transition hover:border-emeraldGlow/50 hover:text-emeraldGlow">Join Community</a>
           </div>
@@ -112,7 +112,7 @@ export default function HomePage() {
 
       <div className="fixed bottom-0 left-0 right-0 z-50 border-t border-emeraldGlow/20 bg-ink/95 p-3 backdrop-blur md:hidden">
         <div className="mx-auto grid max-w-xl grid-cols-2 gap-2">
-          <a href="#eligibility" className="rounded-full bg-emeraldGlow px-4 py-3 text-center text-xs font-semibold text-ink">Check Eligibility</a>
+          <a href="/eligibility" className="rounded-full bg-emeraldGlow px-4 py-3 text-center text-xs font-semibold text-ink">Check Eligibility</a>
           <a href="#cta" className="rounded-full border border-emeraldGlow/50 px-4 py-3 text-center text-xs font-semibold text-emeraldGlow">Book Consultation</a>
         </div>
       </div>
