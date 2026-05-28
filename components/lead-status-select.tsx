@@ -29,26 +29,12 @@ export default function LeadStatusSelect({ leadId, initialStatus }: { leadId: st
 
   return (
     <div className="flex items-center gap-2">
-      <select
-        className="rounded-md border border-white/20 bg-zinc-900 px-2 py-1 text-xs text-white"
-        value={status}
-        onChange={(event) => setStatus(event.target.value as LeadStatus)}
-        disabled={saving}
-      >
+      <select className="rounded-md border border-white/20 bg-zinc-900 px-2 py-1 text-xs text-white" value={status} onChange={(event) => setStatus(event.target.value as LeadStatus)} disabled={saving}>
         {LEAD_STATUS_OPTIONS.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
+          <option key={option} value={option}>{option}</option>
         ))}
       </select>
-      <button
-        type="button"
-        onClick={onSave}
-        disabled={saving}
-        className="rounded-md border border-white/20 px-2 py-1 text-xs text-zinc-200"
-      >
-        {saving ? 'Saving...' : 'Save'}
-      </button>
+      <button type="button" onClick={onSave} disabled={saving} className="rounded-md border border-white/20 px-2 py-1 text-xs text-zinc-200">{saving ? 'Saving...' : 'Save'}</button>
       {error ? <span className="text-xs text-red-400">{error}</span> : null}
     </div>
   );

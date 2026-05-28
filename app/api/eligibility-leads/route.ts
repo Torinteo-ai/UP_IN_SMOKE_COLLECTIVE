@@ -1,13 +1,24 @@
-import { NextResponse } from 'next/server';
+import { apiError, apiSuccess } from '@/lib/api-response';
 import { createSupabaseAdminClient } from '@/lib/supabase';
 import { parseEligibilityLead } from '@/lib/lead-validation';
+import { applyBasicRateLimit } from '@/lib/rate-limit';
 
 export async function POST(request: Request) {
+  const forwardedFor = request.headers.get('x-forwarded-for') ?? '';
+  const ip = forwardedFor.split(',')[0]?.trim() || 'unknown';
+  const rateLimit = applyBasicRateLimit(`eligibility:${ip}`, 60_000, 10);
+
+  if (!rateLimit.allowed) {
+    return apiError('RATE_LIMITED', 'Too many submissions. Please try again shortly.', 429, {
+      retryAfterSec: rateLimit.retryAfterSec,
+    });
+  }
+
   const body = await request.json().catch(() => null);
   const { data, error } = parseEligibilityLead(body);
 
   if (error || !data) {
-    return NextResponse.json({ error: error ?? 'Invalid submission.' }, { status: 400 });
+    return apiError('BAD_REQUEST', error ?? 'Invalid submission.', 400);
   }
 
   const supabaseAdmin = createSupabaseAdminClient();
@@ -25,8 +36,8 @@ export async function POST(request: Request) {
   });
 
   if (insertError) {
-    return NextResponse.json({ error: 'Unable to save your submission right now.' }, { status: 500 });
+    return apiError('INTERNAL_ERROR', 'Unable to save your submission right now.', 500);
   }
 
-  return NextResponse.json({ ok: true });
+  return apiSuccess({ submitted: true });
 }

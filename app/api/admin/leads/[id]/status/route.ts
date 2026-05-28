@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { apiError, apiSuccess } from '@/lib/api-response';
 import { createSupabaseAdminClient } from '@/lib/supabase';
 import { parseLeadStatus } from '@/lib/lead-validation';
 
@@ -9,20 +9,41 @@ export async function PATCH(request: Request, context: RouteContext) {
   const { status, error } = parseLeadStatus(body);
 
   if (error || !status) {
-    return NextResponse.json({ error: error ?? 'Invalid status.' }, { status: 400 });
+    return apiError('BAD_REQUEST', error ?? 'Invalid status.', 400);
   }
 
   const supabaseAdmin = createSupabaseAdminClient();
   const leadId = context.params.id;
 
-  const { error: updateError } = await supabaseAdmin
+  const { data: existingLead, error: fetchError } = await supabaseAdmin
     .from('eligibility_leads')
-    .update({ status })
-    .eq('id', leadId);
+    .select('id, status')
+    .eq('id', leadId)
+    .single();
 
-  if (updateError) {
-    return NextResponse.json({ error: 'Unable to update lead status.' }, { status: 500 });
+  if (fetchError || !existingLead) {
+    return apiError('NOT_FOUND', 'Lead not found.', 404);
   }
 
-  return NextResponse.json({ ok: true, status });
+  const now = new Date().toISOString();
+  const updatePayload: Record<string, string> = { status, updated_at: now };
+
+  if (existingLead.status !== status) {
+    updatePayload.status_updated_at = now;
+  }
+
+  const { error: updateError } = await supabaseAdmin.from('eligibility_leads').update(updatePayload).eq('id', leadId);
+
+  if (updateError) {
+    return apiError('INTERNAL_ERROR', 'Unable to update lead status.', 500);
+  }
+
+  await supabaseAdmin.from('lead_admin_activity').insert({
+    lead_id: leadId,
+    activity_type: 'status_change',
+    previous_value: existingLead.status,
+    new_value: status,
+  });
+
+  return apiSuccess({ status });
 }
