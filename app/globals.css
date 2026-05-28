@@ -2,31 +2,31 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  color-scheme: dark;
-}
-
-html {
-  scroll-behavior: smooth;
-}
+:root { color-scheme: dark; }
+html { scroll-behavior: smooth; }
 
 body {
-  @apply min-h-screen overflow-x-hidden bg-ink text-zinc-100 antialiased;
+  @apply min-h-screen overflow-x-hidden antialiased;
+  background: radial-gradient(1200px 700px at 15% -10%, #232720 0%, transparent 55%),
+    radial-gradient(900px 500px at 100% 10%, #1a1c18 0%, transparent 55%),
+    #0d0d0d;
+  color: #e9e2d6;
 }
 
-.section-shell {
-  @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-8;
-}
+.section-shell { @apply mx-auto w-full max-w-6xl px-4 sm:px-6 lg:px-10; }
 
-.glass-card {
-  @apply rounded-2xl border border-emeraldGlow/20 bg-charcoal/80 shadow-soft backdrop-blur;
-}
+.brand-surface { position: relative; isolation: isolate; }
+.brand-nav { position: sticky; top: 0; z-index: 40; background: rgba(11, 11, 11, 0.84); backdrop-filter: blur(10px); border-bottom: 1px solid #2e312c; }
+.brand-panel { border: 1px solid #343831; background: linear-gradient(160deg, rgba(28, 29, 27, 0.95), rgba(15, 15, 15, 0.95)); border-radius: 1.5rem; box-shadow: 0 14px 40px rgba(0, 0, 0, 0.35); }
+.brand-kicker { font-size: 0.74rem; text-transform: uppercase; letter-spacing: 0.24em; color: #9ca790; }
+.brand-link { color: #c8c0b2; transition: color 180ms ease; }
+.brand-link:hover { color: #e9e2d6; }
+.brand-cta { display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; padding: 0.68rem 1.2rem; font-size: 0.85rem; font-weight: 600; background: #909b81; color: #121212; transition: filter 200ms ease; }
+.brand-cta:hover { filter: brightness(1.08); }
+.brand-ghost-btn { display: inline-flex; align-items: center; justify-content: center; border-radius: 9999px; padding: 0.68rem 1.2rem; border: 1px solid #42463f; color: #d8d0c2; }
+.brand-smoke { position: absolute; pointer-events: none; filter: blur(2px); border-radius: 9999px; opacity: 0.6; }
+.brand-smoke-a { width: 340px; height: 170px; top: 1rem; right: 3%; background: radial-gradient(circle, rgba(153, 165, 137, 0.34), transparent 65%); }
+.brand-smoke-b { width: 420px; height: 220px; bottom: -1.5rem; left: 8%; background: radial-gradient(circle, rgba(225, 214, 190, 0.2), transparent 70%); }
 
-.step-fade {
-  animation: fadeStep 260ms ease;
-}
-
-@keyframes fadeStep {
-  from { opacity: 0; transform: translateY(8px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+.step-fade { animation: fadeStep 260ms ease; }
+@keyframes fadeStep { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
