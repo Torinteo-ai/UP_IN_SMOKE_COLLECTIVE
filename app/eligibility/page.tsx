@@ -1,18 +1,18 @@
 import EligibilityForm from '@/components/eligibility-form';
+import Logo from '@/components/logo';
 
 export default function EligibilityPage() {
   return (
-    <main className="relative min-h-screen bg-grain pb-14 pt-10 md:pb-20">
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(125,255,191,0.12),transparent_45%)]" />
-      </div>
+    <main className="brand-surface min-h-screen py-10 md:py-16">
+      <section className="section-shell">
+        <a href="/" className="mb-8 inline-flex" aria-label="Back home">
+          <Logo />
+        </a>
 
-      <section className="section-shell relative">
-        <div className="mb-10 max-w-3xl">
-          <a href="/" className="text-xs uppercase tracking-[0.2em] text-zinc-400 transition hover:text-emeraldGlow">← Back to home</a>
-          <p className="mt-6 text-xs uppercase tracking-[0.25em] text-zinc-400">Eligibility + Lead Capture</p>
-          <h1 className="mt-3 text-4xl font-semibold leading-tight text-white md:text-5xl">Start your onboarding journey.</h1>
-          <p className="mt-5 text-zinc-300">Complete this short flow to check eligibility, submit key details, and confirm whether you want a consultation with a licensed UK clinical partner.</p>
+        <div className="brand-panel mb-8 rounded-[2rem] p-7 md:p-10">
+          <p className="brand-kicker">Eligibility Intake</p>
+          <h1 className="mt-3 text-4xl font-medium leading-tight text-[#efe7d7] md:text-5xl">Check suitability for a clinician consultation.</h1>
+          <p className="mt-4 max-w-3xl text-stone-300">Share essential details for independent review. This intake supports a responsible, medical-wellness pathway and does not guarantee prescription approval.</p>
         </div>
 
         <EligibilityForm />

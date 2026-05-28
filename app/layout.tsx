@@ -2,9 +2,8 @@ import type { Metadata } from 'next';
 import './globals.css';
 
 export const metadata: Metadata = {
-  title: 'UP IN SMOKE | UK Medical Wellness',
-  description:
-    'A premium UK wellness platform helping eligible patients connect with licensed clinics.',
+  title: 'UP IN SMOKE COLLECTIVE | Medical Wellness Gateway',
+  description: 'Premium UK medical-wellness intake experience connecting eligible patients to licensed clinical partners.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
