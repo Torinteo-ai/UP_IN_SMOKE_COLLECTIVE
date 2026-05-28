@@ -11,7 +11,7 @@ html {
 }
 
 body {
-  @apply bg-ink text-zinc-100 antialiased;
+  @apply min-h-screen overflow-x-hidden bg-ink text-zinc-100 antialiased;
 }
 
 .section-shell {

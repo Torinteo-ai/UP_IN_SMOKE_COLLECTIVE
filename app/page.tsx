@@ -13,8 +13,10 @@ const reasons = [
 
 export default function HomePage() {
   return (
-    <main className="relative overflow-hidden bg-grain">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(125,255,191,0.12),transparent_45%)]" />
+    <main className="relative min-h-screen bg-grain">
+      <div className="pointer-events-none absolute inset-0 overflow-hidden">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(125,255,191,0.12),transparent_45%)]" />
+      </div>
 
       <header className="sticky top-0 z-40 border-b border-white/5 bg-ink/80 backdrop-blur-xl">
         <div className="section-shell flex h-16 items-center justify-between">
