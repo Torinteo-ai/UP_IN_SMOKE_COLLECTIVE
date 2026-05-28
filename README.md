@@ -84,3 +84,5 @@ Required environment variables:
 - `SUPABASE_SERVICE_ROLE_KEY`
 
 Run `db/eligibility_leads.sql` in Supabase SQL editor to ensure the existing `eligibility_leads` table has a persisted `status` column and constraints.
+
+<!-- trigger deployment -->
