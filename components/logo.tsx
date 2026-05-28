@@ -10,7 +10,7 @@ export default function Logo({ className = '', showWordmark = true }: LogoProps)
 
   return (
     <Image
-      src="/uisc-logo.svg"
+      src="/logo/uisc-logo.svg"
       alt="UP IN SMOKE COLLECTIVE"
       width={size}
       height={size}
