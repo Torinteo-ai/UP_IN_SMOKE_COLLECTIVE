@@ -6,16 +6,15 @@ type LogoProps = {
 };
 
 export default function Logo({ className = '', showWordmark = true }: LogoProps) {
-  const width = showWordmark ? 194 : 40;
-  const height = showWordmark ? 34 : 40;
+  const size = showWordmark ? 84 : 40;
 
   return (
     <Image
       src="/uisc-logo.svg"
       alt="UP IN SMOKE COLLECTIVE"
-      width={width}
-      height={height}
-      className={`h-auto ${showWordmark ? 'w-[min(52vw,194px)] md:w-[194px]' : 'w-10'} ${className}`.trim()}
+      width={size}
+      height={size}
+      className={`${showWordmark ? 'w-[min(32vw,84px)] md:w-[84px]' : 'w-10'} h-auto ${className}`.trim()}
       priority
     />
   );
